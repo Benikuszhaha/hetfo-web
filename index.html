@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>HÉTFŐ / ÖREG</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #111;
+            color: #eee;
+            text-align: center;
+            padding: 40px;
+        }
+        button {
+            font-size: 20px;
+            padding: 15px 30px;
+            cursor: pointer;
+        }
+        #log {
+            margin-top: 30px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🎧 HÉTFŐ / ÖREG</h1>
+<button onclick="startListening()">🎤 Beszélj</button>
+
+<div id="log"></div>
+
+<script>
+let mode = "komoly"; // alap: komoly = HÉTFŐ
+
+// Beszédfelismerés
+const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+recognition.lang = "hu-HU";
+
+// TTS beszéd
+function speak(text) {
+    alert("HÉTFŐ / ÖREG mondja: " + text); // popup, hogy lásd azonnal
+    const msg = new SpeechSynthesisUtterance(text);
+    msg.lang = "hu-HU";
+    msg.volume = 1;
+    msg.rate = 1;
+    msg.pitch = 1;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(msg);
+}
+
+// Gomb megnyomására hallgatás
+function startListening() {
+    alert("Mikrofon engedélyezve? Beszélj most!");
+    recognition.start();
+}
+
+// Eredmény feldolgozása
+recognition.onresult = (event) => {
+    const text = event.results[0][0].transcript.toLowerCase();
+    document.getElementById("log").innerText = "Te: " + text;
+    alert("Felismerte: " + text); // popup minden felismert szóról
+
+    if (text.includes("hétfő")) {
+        mode = "komoly";
+        speak("Rendben. Komoly mód aktiválva.");
+        return;
+    }
+
+    if (text.includes("öreg")) {
+        mode = "szarkasztikus";
+        speak("Na végre. Szarkazmus betöltve.");
+        return;
+    }
+
+    let response = "";
+    if (mode === "komoly") {
+        response = "Értettem. Mit szeretnél tudni?";
+    } else {
+        response = "Hát persze. És ezt most tőlem kérdezed?";
+    }
+
+    speak(response);
+};
+
+// Hiba esemény
+recognition.onerror = (event) => {
+    alert("Hiba a beszédfelismerésnél: " + event.error);
+};
+</script>
+
+</body>
+</html>
